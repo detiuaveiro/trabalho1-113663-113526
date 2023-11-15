@@ -10,8 +10,8 @@
 /// 2013, 2023
 
 // Student authors (fill in below):
-// NMec:  Name:
-// 
+// NMec: 113526  Name: Rodrigo Marques de Jesus
+// NMec: 113663  Name: Bruno Guilherme Mendes de Oliveira
 // 
 // 
 // Date:
@@ -47,10 +47,10 @@ const uint8 PixMax = 255;
 
 // Internal structure for storing 8-bit graymap images
 struct image {
-  int width;
-  int height;
-  int maxval;   // maximum gray value (pixels with maxval are pure WHITE)
-  uint8* pixel; // pixel data (a raster scan)
+    int width;
+    int height;
+    int maxval;   // maximum gray value (pixels with maxval are pure WHITE)
+    uint8 *pixel; // pixel data (a raster scan)
 };
 
 
@@ -61,7 +61,7 @@ struct image {
 
 // In this module, only functions dealing with memory allocation or file
 // (I/O) operations use defensive techniques.
-// 
+//
 // When one of these functions fails, it signals this by returning an error
 // value such as NULL or 0 (see function documentation), and sets an internal
 // variable (errCause) to a string indicating the failure cause.
@@ -77,7 +77,7 @@ struct image {
 static int errsave = 0;
 
 // Error cause
-static char* errCause;
+static char *errCause;
 
 /// Error cause.
 /// After some other module function fails (and returns an error code),
@@ -87,8 +87,8 @@ static char* errCause;
 ///
 /// After a successful operation, the result is not garanteed (it might be
 /// the previous error cause).  It is not meant to be used in that situation!
-char* ImageErrMsg() { ///
-  return errCause;
+char *ImageErrMsg() { ///
+    return errCause;
 }
 
 
@@ -110,7 +110,7 @@ char* ImageErrMsg() { ///
 // (check) that is used to wrap the function calls and error tests, and chain
 // them into a long Boolean expression that reflects the success of the entire
 // operation:
-//   success = 
+//   success =
 //   check( funA(x) != error , "MsgFailA" ) &&
 //   check( funB(x) != error , "MsgFailB" ) &&
 //   check( funC(x) != error , "MsgFailC" ) ;
@@ -118,14 +118,14 @@ char* ImageErrMsg() { ///
 //     conditionalCleanupCode();
 //   }
 //   return success;
-// 
+//
 // When a function fails, the chain is interrupted, thanks to the
 // short-circuit && operator, and execution jumps to the cleanup code.
 // Meanwhile, check() set errCause to an appropriate message.
-// 
+//
 // This technique has some legibility issues and is not always applicable,
 // but it is quite concise, and concentrates cleanup code in a single place.
-// 
+//
 // See example utilization in ImageLoad and ImageSave.
 //
 // (You are not required to use this in your code!)
@@ -135,25 +135,25 @@ char* ImageErrMsg() { ///
 // This may be used to chain a sequence of operations and verify its success.
 // Propagates the condition.
 // Preserves global errno!
-static int check(int condition, const char* failmsg) {
-  errCause = (char*)(condition ? "" : failmsg);
-  return condition;
+static int check(int condition, const char *failmsg) {
+    errCause = (char *) (condition ? "" : failmsg);
+    return condition;
 }
 
 
 /// Init Image library.  (Call once!)
 /// Currently, simply calibrate instrumentation and set names of counters.
 void ImageInit(void) { ///
-  InstrCalibrate();
-  InstrName[0] = "pixmem";  // InstrCount[0] will count pixel array acesses
-  // Name other counters here...
-  
+    InstrCalibrate();
+    InstrName[0] = "pixmem";  // InstrCount[0] will count pixel array acesses
+    // Name other counters here...
+    // TO DO
 }
 
 // Macros to simplify accessing instrumentation counters:
 #define PIXMEM InstrCount[0]
 // Add more macros here...
-
+// TO DO
 // TIP: Search for PIXMEM or InstrCount to see where it is incremented!
 
 
@@ -163,15 +163,16 @@ void ImageInit(void) { ///
 ///   width, height : the dimensions of the new image.
 ///   maxval: the maximum gray level (corresponding to white).
 /// Requires: width and height must be non-negative, maxval > 0.
-/// 
+///
 /// On success, a new image is returned.
 /// (The caller is responsible for destroying the returned image!)
 /// On failure, returns NULL and errno/errCause are set accordingly.
 Image ImageCreate(int width, int height, uint8 maxval) { ///
-  assert (width >= 0);
-  assert (height >= 0);
-  assert (0 < maxval && maxval <= PixMax);
-  // Insert your code here!
+    assert (width >= 0);
+    assert (height >= 0);
+    assert (0 < maxval && maxval <= PixMax);
+    // Insert your code here!
+    // TO DO
 }
 
 /// Destroy the image pointed to by (*imgp).
@@ -179,9 +180,10 @@ Image ImageCreate(int width, int height, uint8 maxval) { ///
 /// If (*imgp)==NULL, no operation is performed.
 /// Ensures: (*imgp)==NULL.
 /// Should never fail, and should preserve global errno/errCause.
-void ImageDestroy(Image* imgp) { ///
-  assert (imgp != NULL);
-  // Insert your code here!
+void ImageDestroy(Image *imgp) { ///
+    assert (imgp != NULL);
+    // Insert your code here!
+    // TO DO
 }
 
 
@@ -193,13 +195,13 @@ void ImageDestroy(Image* imgp) { ///
 // Match and skip 0 or more comment lines in file f.
 // Comments start with a # and continue until the end-of-line, inclusive.
 // Returns the number of comments skipped.
-static int skipComments(FILE* f) {
-  char c;
-  int i = 0;
-  while (fscanf(f, "#%*[^\n]%c", &c) == 1 && c == '\n') {
-    i++;
-  }
-  return i;
+static int skipComments(FILE *f) {
+    char c;
+    int i = 0;
+    while (fscanf(f, "#%*[^\n]%c", &c) == 1 && c == '\n') {
+        i++;
+    }
+    return i;
 }
 
 /// Load a raw PGM file.
@@ -207,60 +209,60 @@ static int skipComments(FILE* f) {
 /// On success, a new image is returned.
 /// (The caller is responsible for destroying the returned image!)
 /// On failure, returns NULL and errno/errCause are set accordingly.
-Image ImageLoad(const char* filename) { ///
-  int w, h;
-  int maxval;
-  char c;
-  FILE* f = NULL;
-  Image img = NULL;
+Image ImageLoad(const char *filename) { ///
+    int w, h;
+    int maxval;
+    char c;
+    FILE *f = NULL;
+    Image img = NULL;
 
-  int success = 
-  check( (f = fopen(filename, "rb")) != NULL, "Open failed" ) &&
-  // Parse PGM header
-  check( fscanf(f, "P%c ", &c) == 1 && c == '5' , "Invalid file format" ) &&
-  skipComments(f) >= 0 &&
-  check( fscanf(f, "%d ", &w) == 1 && w >= 0 , "Invalid width" ) &&
-  skipComments(f) >= 0 &&
-  check( fscanf(f, "%d ", &h) == 1 && h >= 0 , "Invalid height" ) &&
-  skipComments(f) >= 0 &&
-  check( fscanf(f, "%d", &maxval) == 1 && 0 < maxval && maxval <= (int)PixMax , "Invalid maxval" ) &&
-  check( fscanf(f, "%c", &c) == 1 && isspace(c) , "Whitespace expected" ) &&
-  // Allocate image
-  (img = ImageCreate(w, h, (uint8)maxval)) != NULL &&
-  // Read pixels
-  check( fread(img->pixel, sizeof(uint8), w*h, f) == w*h , "Reading pixels" );
-  PIXMEM += (unsigned long)(w*h);  // count pixel memory accesses
+    int success =
+            check((f = fopen(filename, "rb")) != NULL, "Open failed") &&
+            // Parse PGM header
+            check(fscanf(f, "P%c ", &c) == 1 && c == '5', "Invalid file format") &&
+            skipComments(f) >= 0 &&
+            check(fscanf(f, "%d ", &w) == 1 && w >= 0, "Invalid width") &&
+            skipComments(f) >= 0 &&
+            check(fscanf(f, "%d ", &h) == 1 && h >= 0, "Invalid height") &&
+            skipComments(f) >= 0 &&
+            check(fscanf(f, "%d", &maxval) == 1 && 0 < maxval && maxval <= (int) PixMax, "Invalid maxval") &&
+            check(fscanf(f, "%c", &c) == 1 && isspace(c), "Whitespace expected") &&
+            // Allocate image
+            (img = ImageCreate(w, h, (uint8) maxval)) != NULL &&
+            // Read pixels
+            check(fread(img->pixel, sizeof(uint8), w * h, f) == w * h, "Reading pixels");
+    PIXMEM += (unsigned long) (w * h);  // count pixel memory accesses
 
-  // Cleanup
-  if (!success) {
-    errsave = errno;
-    ImageDestroy(&img);
-    errno = errsave;
-  }
-  if (f != NULL) fclose(f);
-  return img;
+    // Cleanup
+    if ( !success ) {
+        errsave = errno;
+        ImageDestroy(&img);
+        errno = errsave;
+    }
+    if ( f != NULL) fclose(f);
+    return img;
 }
 
 /// Save image to PGM file.
 /// On success, returns nonzero.
 /// On failure, returns 0, errno/errCause are set appropriately, and
 /// a partial and invalid file may be left in the system.
-int ImageSave(Image img, const char* filename) { ///
-  assert (img != NULL);
-  int w = img->width;
-  int h = img->height;
-  uint8 maxval = img->maxval;
-  FILE* f = NULL;
+int ImageSave(Image img, const char *filename) { ///
+    assert (img != NULL);
+    int w = img->width;
+    int h = img->height;
+    uint8 maxval = img->maxval;
+    FILE *f = NULL;
 
-  int success =
-  check( (f = fopen(filename, "wb")) != NULL, "Open failed" ) &&
-  check( fprintf(f, "P5\n%d %d\n%u\n", w, h, maxval) > 0, "Writing header failed" ) &&
-  check( fwrite(img->pixel, sizeof(uint8), w*h, f) == w*h, "Writing pixels failed" ); 
-  PIXMEM += (unsigned long)(w*h);  // count pixel memory accesses
+    int success =
+            check((f = fopen(filename, "wb")) != NULL, "Open failed") &&
+            check(fprintf(f, "P5\n%d %d\n%u\n", w, h, maxval) > 0, "Writing header failed") &&
+            check(fwrite(img->pixel, sizeof(uint8), w * h, f) == w * h, "Writing pixels failed");
+    PIXMEM += (unsigned long) (w * h);  // count pixel memory accesses
 
-  // Cleanup
-  if (f != NULL) fclose(f);
-  return success;
+    // Cleanup
+    if ( f != NULL) fclose(f);
+    return success;
 }
 
 
@@ -270,20 +272,20 @@ int ImageSave(Image img, const char* filename) { ///
 
 /// Get image width
 int ImageWidth(Image img) { ///
-  assert (img != NULL);
-  return img->width;
+    assert (img != NULL);
+    return img->width;
 }
 
 /// Get image height
 int ImageHeight(Image img) { ///
-  assert (img != NULL);
-  return img->height;
+    assert (img != NULL);
+    return img->height;
 }
 
 /// Get image maximum gray level
 int ImageMaxval(Image img) { ///
-  assert (img != NULL);
-  return img->maxval;
+    assert (img != NULL);
+    return img->maxval;
 }
 
 /// Pixel stats
@@ -291,55 +293,58 @@ int ImageMaxval(Image img) { ///
 /// On return,
 /// *min is set to the minimum gray level in the image,
 /// *max is set to the maximum.
-void ImageStats(Image img, uint8* min, uint8* max) { ///
-  assert (img != NULL);
-  // Insert your code here!
+void ImageStats(Image img, uint8 *min, uint8 *max) { ///
+    assert (img != NULL);
+    // Insert your code here!
+    // TO DO
 }
 
 /// Check if pixel position (x,y) is inside img.
 int ImageValidPos(Image img, int x, int y) { ///
-  assert (img != NULL);
-  return (0 <= x && x < img->width) && (0 <= y && y < img->height);
+    assert (img != NULL);
+    return (0 <= x && x < img->width) && (0 <= y && y < img->height);
 }
 
 /// Check if rectangular area (x,y,w,h) is completely inside img.
 int ImageValidRect(Image img, int x, int y, int w, int h) { ///
-  assert (img != NULL);
-  // Insert your code here!
+    assert (img != NULL);
+    // Insert your code here!
+    // TO DO
 }
 
 /// Pixel get & set operations
 
 /// These are the primitive operations to access and modify a single pixel
 /// in the image.
-/// These are very simple, but fundamental operations, which may be used to 
+/// These are very simple, but fundamental operations, which may be used to
 /// implement more complex operations.
 
 // Transform (x, y) coords into linear pixel index.
-// This internal function is used in ImageGetPixel / ImageSetPixel. 
+// This internal function is used in ImageGetPixel / ImageSetPixel.
 // The returned index must satisfy (0 <= index < img->width*img->height)
 static inline int G(Image img, int x, int y) {
-  int index;
-  // Insert your code here!
-  assert (0 <= index && index < img->width*img->height);
-  return index;
+    int index;
+    // Insert your code here!
+    // TO DO
+    assert (0 <= index && index < img->width * img->height);
+    return index;
 }
 
 /// Get the pixel (level) at position (x,y).
 uint8 ImageGetPixel(Image img, int x, int y) { ///
-  assert (img != NULL);
-  assert (ImageValidPos(img, x, y));
-  PIXMEM += 1;  // count one pixel access (read)
-  return img->pixel[G(img, x, y)];
-} 
+    assert (img != NULL);
+    assert (ImageValidPos(img, x, y));
+    PIXMEM += 1;  // count one pixel access (read)
+    return img->pixel[G(img, x, y)];
+}
 
 /// Set the pixel at position (x,y) to new level.
 void ImageSetPixel(Image img, int x, int y, uint8 level) { ///
-  assert (img != NULL);
-  assert (ImageValidPos(img, x, y));
-  PIXMEM += 1;  // count one pixel access (store)
-  img->pixel[G(img, x, y)] = level;
-} 
+    assert (img != NULL);
+    assert (ImageValidPos(img, x, y));
+    PIXMEM += 1;  // count one pixel access (store)
+    img->pixel[G(img, x, y)] = level;
+}
 
 
 /// Pixel transformations
@@ -354,16 +359,18 @@ void ImageSetPixel(Image img, int x, int y, uint8 level) { ///
 /// This transforms dark pixels to light pixels and vice-versa,
 /// resulting in a "photographic negative" effect.
 void ImageNegative(Image img) { ///
-  assert (img != NULL);
-  // Insert your code here!
+    assert (img != NULL);
+    // Insert your code here!
+    // TO DO
 }
 
 /// Apply threshold to image.
 /// Transform all pixels with level<thr to black (0) and
 /// all pixels with level>=thr to white (maxval).
 void ImageThreshold(Image img, uint8 thr) { ///
-  assert (img != NULL);
-  // Insert your code here!
+    assert (img != NULL);
+    // Insert your code here!
+    // TO DO
 }
 
 /// Brighten image by a factor.
@@ -371,9 +378,10 @@ void ImageThreshold(Image img, uint8 thr) { ///
 /// This will brighten the image if factor>1.0 and
 /// darken the image if factor<1.0.
 void ImageBrighten(Image img, double factor) { ///
-  assert (img != NULL);
-  // ? assert (factor >= 0.0);
-  // Insert your code here!
+    assert (img != NULL);
+    // ? assert (factor >= 0.0);
+    // Insert your code here!
+    // TO DO
 }
 
 
@@ -381,38 +389,40 @@ void ImageBrighten(Image img, double factor) { ///
 
 /// These functions apply geometric transformations to an image,
 /// returning a new image as a result.
-/// 
+///
 /// Success and failure are treated as in ImageCreate:
 /// On success, a new image is returned.
 /// (The caller is responsible for destroying the returned image!)
 /// On failure, returns NULL and errno/errCause are set accordingly.
 
-// Implementation hint: 
+// Implementation hint:
 // Call ImageCreate whenever you need a new image!
 
 /// Rotate an image.
 /// Returns a rotated version of the image.
 /// The rotation is 90 degrees anti-clockwise.
 /// Ensures: The original img is not modified.
-/// 
+///
 /// On success, a new image is returned.
 /// (The caller is responsible for destroying the returned image!)
 /// On failure, returns NULL and errno/errCause are set accordingly.
 Image ImageRotate(Image img) { ///
-  assert (img != NULL);
-  // Insert your code here!
+    assert (img != NULL);
+    // Insert your code here!
+    // TO DO
 }
 
 /// Mirror an image = flip left-right.
 /// Returns a mirrored version of the image.
 /// Ensures: The original img is not modified.
-/// 
+///
 /// On success, a new image is returned.
 /// (The caller is responsible for destroying the returned image!)
 /// On failure, returns NULL and errno/errCause are set accordingly.
 Image ImageMirror(Image img) { ///
-  assert (img != NULL);
-  // Insert your code here!
+    assert (img != NULL);
+    // Insert your code here!
+    // TO DO
 }
 
 /// Crop a rectangular subimage from img.
@@ -423,14 +433,15 @@ Image ImageMirror(Image img) { ///
 /// Ensures:
 ///   The original img is not modified.
 ///   The returned image has width w and height h.
-/// 
+///
 /// On success, a new image is returned.
 /// (The caller is responsible for destroying the returned image!)
 /// On failure, returns NULL and errno/errCause are set accordingly.
 Image ImageCrop(Image img, int x, int y, int w, int h) { ///
-  assert (img != NULL);
-  assert (ImageValidRect(img, x, y, w, h));
-  // Insert your code here!
+    assert (img != NULL);
+    assert (ImageValidRect(img, x, y, w, h));
+    // Insert your code here!
+    // TO DO
 }
 
 
@@ -441,10 +452,11 @@ Image ImageCrop(Image img, int x, int y, int w, int h) { ///
 /// This modifies img1 in-place: no allocation involved.
 /// Requires: img2 must fit inside img1 at position (x, y).
 void ImagePaste(Image img1, int x, int y, Image img2) { ///
-  assert (img1 != NULL);
-  assert (img2 != NULL);
-  assert (ImageValidRect(img1, x, y, img2->width, img2->height));
-  // Insert your code here!
+    assert (img1 != NULL);
+    assert (img2 != NULL);
+    assert (ImageValidRect(img1, x, y, img2->width, img2->height));
+    // Insert your code here!
+    // TO DO
 }
 
 /// Blend an image into a larger image.
@@ -454,30 +466,33 @@ void ImagePaste(Image img1, int x, int y, Image img2) { ///
 /// alpha usually is in [0.0, 1.0], but values outside that interval
 /// may provide interesting effects.  Over/underflows should saturate.
 void ImageBlend(Image img1, int x, int y, Image img2, double alpha) { ///
-  assert (img1 != NULL);
-  assert (img2 != NULL);
-  assert (ImageValidRect(img1, x, y, img2->width, img2->height));
-  // Insert your code here!
+    assert (img1 != NULL);
+    assert (img2 != NULL);
+    assert (ImageValidRect(img1, x, y, img2->width, img2->height));
+    // Insert your code here!
+    // TO DO
 }
 
 /// Compare an image to a subimage of a larger image.
 /// Returns 1 (true) if img2 matches subimage of img1 at pos (x, y).
 /// Returns 0, otherwise.
 int ImageMatchSubImage(Image img1, int x, int y, Image img2) { ///
-  assert (img1 != NULL);
-  assert (img2 != NULL);
-  assert (ImageValidPos(img1, x, y));
-  // Insert your code here!
+    assert (img1 != NULL);
+    assert (img2 != NULL);
+    assert (ImageValidPos(img1, x, y));
+    // Insert your code here!
+    // TO DO
 }
 
 /// Locate a subimage inside another image.
 /// Searches for img2 inside img1.
 /// If a match is found, returns 1 and matching position is set in vars (*px, *py).
 /// If no match is found, returns 0 and (*px, *py) are left untouched.
-int ImageLocateSubImage(Image img1, int* px, int* py, Image img2) { ///
-  assert (img1 != NULL);
-  assert (img2 != NULL);
-  // Insert your code here!
+int ImageLocateSubImage(Image img1, int *px, int *py, Image img2) { ///
+    assert (img1 != NULL);
+    assert (img2 != NULL);
+    // Insert your code here!
+    // TO DO
 }
 
 
@@ -488,6 +503,7 @@ int ImageLocateSubImage(Image img1, int* px, int* py, Image img2) { ///
 /// [x-dx, x+dx]x[y-dy, y+dy].
 /// The image is changed in-place.
 void ImageBlur(Image img, int dx, int dy) { ///
-  // Insert your code here!
+    // Insert your code here!
+    // TO DO
 }
 
