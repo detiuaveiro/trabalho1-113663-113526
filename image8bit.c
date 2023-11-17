@@ -171,8 +171,32 @@ Image ImageCreate(int width, int height, uint8 maxval) { ///
     assert (width >= 0);
     assert (height >= 0);
     assert (0 < maxval && maxval <= PixMax);
-    // Insert your code here!
-    // TO DO
+
+    // Allocating memory for the  new image
+    Image img = (Image)malloc(sizeof(Image));
+
+    if (img == NULL) {
+        return NULL; // If allocation fails return null
+    }
+
+    // Initializing image properties
+    img->width = width;
+    img->height = height;
+    img->maxval = maxval;
+
+    // Allocatinf memory for the pixel data
+    img->pixel = (uint8*)malloc(width * height * sizeof(uint8));
+
+    if (img->pixel == NULL) {
+        free(img); // Free memory that was allocated before
+        return NULL; // If allocation fails return null
+    }
+
+    for(int i = 0; i < width * height; i++) {
+        img->pixel[i] = 255;
+    }
+
+    return img;
 }
 
 /// Destroy the image pointed to by (*imgp).
@@ -182,8 +206,13 @@ Image ImageCreate(int width, int height, uint8 maxval) { ///
 /// Should never fail, and should preserve global errno/errCause.
 void ImageDestroy(Image *imgp) { ///
     assert (imgp != NULL);
-    // Insert your code here!
-    // TO DO
+
+    if (*imgp != NULL) {
+        free((*imgp)->pixel); //Freeing pixel array
+        free(*imgp); //Freeing image
+
+        *imgp = NULL;
+    }
 }
 
 
