@@ -171,13 +171,9 @@ Image ImageCreate(int width, int height, uint8 maxval) { ///
     assert (width >= 0);
     assert (height >= 0);
     assert (0 < maxval && maxval <= PixMax);
+    //Altered
 
-    // Allocating memory for the  new image
-    Image img = (Image)malloc(sizeof(Image));
-
-    if (img == NULL) {
-        return NULL; // If allocation fails return null
-    }
+    Image img = NULL;
 
     // Initializing image properties
     img->width = width;
@@ -188,10 +184,10 @@ Image ImageCreate(int width, int height, uint8 maxval) { ///
     img->pixel = (uint8*)malloc(width * height * sizeof(uint8));
 
     if (img->pixel == NULL) {
-        free(img); // Free memory that was allocated before
         return NULL; // If allocation fails return null
     }
 
+    // Initializing pixels (set all pixels to black)
     for(int i = 0; i < width * height; i++) {
         img->pixel[i] = 255;
     }
@@ -206,10 +202,10 @@ Image ImageCreate(int width, int height, uint8 maxval) { ///
 /// Should never fail, and should preserve global errno/errCause.
 void ImageDestroy(Image *imgp) { ///
     assert (imgp != NULL);
+    //Altered
 
     if (*imgp != NULL) {
         free((*imgp)->pixel); //Freeing pixel array
-        free(*imgp); //Freeing image
 
         *imgp = NULL;
     }
@@ -324,8 +320,21 @@ int ImageMaxval(Image img) { ///
 /// *max is set to the maximum.
 void ImageStats(Image img, uint8 *min, uint8 *max) { ///
     assert (img != NULL);
-    // Insert your code here!
-    // TO DO
+    //Altered
+
+    // Initializing min and max
+    *min = 255;
+    *max = 0;
+
+    // Iterating on pixel array to find min and max
+    for (int i = 1; i < img->width * img->height;i++) {
+        if (img->pixel[i] < *min) {
+            *min = img->pixel[i];
+        } else if (img->pixel[i] > *max) {
+            *max = img->pixel[i];
+        }
+    }
+
 }
 
 /// Check if pixel position (x,y) is inside img.
@@ -337,8 +346,23 @@ int ImageValidPos(Image img, int x, int y) { ///
 /// Check if rectangular area (x,y,w,h) is completely inside img.
 int ImageValidRect(Image img, int x, int y, int w, int h) { ///
     assert (img != NULL);
-    // Insert your code here!
-    // TO DO
+    //Altered
+
+    // Checking if the first corner is inside the image
+    if (!ImageValidPos(img,x, y)) {
+        return 0;
+    }
+
+    // Initializing coordinates of the opposite corner
+    int x2 = x + w - 1;
+    int y2 = y + h - 1;
+
+    // Checking if the opposite corner is inside the image
+    if (!ImageValidPos(img,x2, y2)) {
+        return 0;
+    }
+
+    return 1;
 }
 
 /// Pixel get & set operations
