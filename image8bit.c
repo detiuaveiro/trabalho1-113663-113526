@@ -444,9 +444,19 @@ void ImageBrighten(Image img, double factor) { ///
     assert (factor >= 0.0);
     // Altered
 
+    /*
     for (int i = 0; i < img->width * img->height; i++) {
-        if ((factor * img->pixel[i]) > img->maxval) {img->pixel[i] = img->maxval;} //Verifying if pixel levels don't exceed maxval
-        else {img->pixel[i] = factor * img->pixel[i];}
+        img->pixel[i] = (uint8)factor * img->pixel[i];
+
+        //Verifying if pixel levels don't exceed maxval
+        if (img->pixel[i] > img->maxval) {
+            img->pixel[i] = img->maxval;
+        }
+    } */
+
+    for (int i = 0; i < img->width * img->height; i++) {
+        if (((uint8)factor * img->pixel[i]) > img->maxval) img->pixel[i] = img->maxval; //Verifying if pixel levels don't exceed maxval
+        else img->pixel[i] = (uint8)factor * img->pixel[i];
     }
 }
 
@@ -474,22 +484,8 @@ void ImageBrighten(Image img, double factor) { ///
 /// On failure, returns NULL and errno/errCause are set accordingly.
 Image ImageRotate(Image img) { ///
     assert (img != NULL);
-    // Altered
-
-    // Creating a new image with swapped width and height
-    Image rImg = ImageCreate(img->height, img->width, img->maxval);
-
-    for (int y = 0; y < img->height; y++) {
-        for (int x =0; x < img->width; x++) {
-            // Swap x and y coordinates
-            int rx = y;
-            int ry = img->width - x - 1;
-
-            uint8 level = ImageGetPixel(img,x,y);
-            ImageSetPixel(rImg, rx, ry, level);
-        }
-    }
-    return rImg;
+    // Insert your code here!
+    // TO DO
 }
 
 /// Mirror an image = flip left-right.
@@ -501,23 +497,55 @@ Image ImageRotate(Image img) { ///
 /// On failure, returns NULL and errno/errCause are set accordingly.
 Image ImageMirror(Image img) { ///
     assert (img != NULL);
-    // Altered
-
-    // Creating a new image with same width and height
-    Image mImg = ImageCreate(img->width, img->height, img->maxval);
-
-    for (int y = 0; y < img->height; y++) {
-        for (int x =0; x < img->width; x++) {
-            // Flip x coordinates and keep y the same
-            int rx = img->height - x- 1;
-            int ry = y;
-
-            uint8 level = ImageGetPixel(img,x,y);
-            ImageSetPixel(mImg, rx, ry, level);
-        }
-    }
-    return mImg;
+    // Insert your code here!
+    // TO DO
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 /// Crop a rectangular subimage from img.
 /// The rectangle is specified by the top left corner coords (x, y) and
@@ -536,6 +564,15 @@ Image ImageCrop(Image img, int x, int y, int w, int h) { ///
     assert (ImageValidRect(img, x, y, w, h));
     // Insert your code here!
     // TO DO
+    Image newImg = ImageCreate(w, h, img->maxval);
+
+    // Set all pixels of newImg to correspondent ones of img
+    for(int i = 0; i < w * h; i++) {
+        uint8 index = G(img, x + i % w, y + i / w); // RELATORIO
+        newImg->pixel[i] = img->pixel[index];
+    }
+
+    return newImg;
 }
 
 
@@ -551,6 +588,14 @@ void ImagePaste(Image img1, int x, int y, Image img2) { ///
     assert (ImageValidRect(img1, x, y, img2->width, img2->height));
     // Insert your code here!
     // TO DO
+
+    int w = img2->width;
+    int h = img2->height;
+    // Set all pixels of newImg to correspondent ones of img
+    for(int i = 0; i < w * h; i++) {
+        uint8 index = G(img1, x + i % w, y + i / w); // RELATORIO
+        img1->pixel[index] = img2->pixel[i];
+    }
 }
 
 /// Blend an image into a larger image.
