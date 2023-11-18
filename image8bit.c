@@ -171,7 +171,7 @@ Image ImageCreate(int width, int height, uint8 maxval) { ///
     assert (width >= 0);
     assert (height >= 0);
     assert (0 < maxval && maxval <= PixMax);
-    //Altered
+    // Altered
 
     Image img = NULL;
 
@@ -189,7 +189,7 @@ Image ImageCreate(int width, int height, uint8 maxval) { ///
 
     // Initializing pixels (set all pixels to black)
     for(int i = 0; i < width * height; i++) {
-        img->pixel[i] = 255;
+        img->pixel[i] = 0;
     }
 
     return img;
@@ -202,11 +202,10 @@ Image ImageCreate(int width, int height, uint8 maxval) { ///
 /// Should never fail, and should preserve global errno/errCause.
 void ImageDestroy(Image *imgp) { ///
     assert (imgp != NULL);
-    //Altered
+    // Altered
 
     if (*imgp != NULL) {
         free((*imgp)->pixel); //Freeing pixel array
-
         *imgp = NULL;
     }
 }
@@ -320,7 +319,7 @@ int ImageMaxval(Image img) { ///
 /// *max is set to the maximum.
 void ImageStats(Image img, uint8 *min, uint8 *max) { ///
     assert (img != NULL);
-    //Altered
+    // Altered
 
     // Initializing min and max
     *min = 255;
@@ -346,7 +345,7 @@ int ImageValidPos(Image img, int x, int y) { ///
 /// Check if rectangular area (x,y,w,h) is completely inside img.
 int ImageValidRect(Image img, int x, int y, int w, int h) { ///
     assert (img != NULL);
-    //Altered
+    // Altered
 
     // Checking if the first corner is inside the image
     if (!ImageValidPos(img,x, y)) {
@@ -376,9 +375,10 @@ int ImageValidRect(Image img, int x, int y, int w, int h) { ///
 // This internal function is used in ImageGetPixel / ImageSetPixel.
 // The returned index must satisfy (0 <= index < img->width*img->height)
 static inline int G(Image img, int x, int y) {
-    int index;
-    // Insert your code here!
-    // TO DO
+    // Altered
+
+    int index = y * img->width + x;
+
     assert (0 <= index && index < img->width * img->height);
     return index;
 }
@@ -413,8 +413,11 @@ void ImageSetPixel(Image img, int x, int y, uint8 level) { ///
 /// resulting in a "photographic negative" effect.
 void ImageNegative(Image img) { ///
     assert (img != NULL);
-    // Insert your code here!
-    // TO DO
+    // Altered
+
+    for (int i = 0; i < img->width * img->height; i++) {
+        img->pixel[i] = PixMax - img->pixel[i]; // Invert pixel values by doing 255 - current value
+    }
 }
 
 /// Apply threshold to image.
@@ -422,8 +425,13 @@ void ImageNegative(Image img) { ///
 /// all pixels with level>=thr to white (maxval).
 void ImageThreshold(Image img, uint8 thr) { ///
     assert (img != NULL);
-    // Insert your code here!
-    // TO DO
+    // Altered
+
+    for (int i = 0; i < img->width * img->height; i++) {
+        if (img->pixel[i] < thr) {
+            img->pixel[i] = 0; // Set pixel to black
+        } else img->pixel[i] = img->maxval; // Set pixel to maxval
+    }
 }
 
 /// Brighten image by a factor.
@@ -432,9 +440,23 @@ void ImageThreshold(Image img, uint8 thr) { ///
 /// darken the image if factor<1.0.
 void ImageBrighten(Image img, double factor) { ///
     assert (img != NULL);
-    // ? assert (factor >= 0.0);
-    // Insert your code here!
-    // TO DO
+    assert (factor >= 0.0);
+    // Altered
+
+    /*
+    for (int i = 0; i < img->width * img->height; i++) {
+        img->pixel[i] = (uint8)factor * img->pixel[i];
+
+        //Verifying if pixel levels don't exceed maxval
+        if (img->pixel[i] > img->maxval) {
+            img->pixel[i] = img->maxval;
+        }
+    } */
+
+    for (int i = 0; i < img->width * img->height; i++) {
+        if (((uint8)factor * img->pixel[i]) > img->maxval) img->pixel[i] = img->maxval; //Verifying if pixel levels don't exceed maxval
+        else img->pixel[i] = (uint8)factor * img->pixel[i];
+    }
 }
 
 
