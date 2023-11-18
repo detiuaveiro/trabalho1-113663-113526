@@ -444,19 +444,9 @@ void ImageBrighten(Image img, double factor) { ///
     assert (factor >= 0.0);
     // Altered
 
-    /*
     for (int i = 0; i < img->width * img->height; i++) {
-        img->pixel[i] = (uint8)factor * img->pixel[i];
-
-        //Verifying if pixel levels don't exceed maxval
-        if (img->pixel[i] > img->maxval) {
-            img->pixel[i] = img->maxval;
-        }
-    } */
-
-    for (int i = 0; i < img->width * img->height; i++) {
-        if (((uint8)factor * img->pixel[i]) > img->maxval) img->pixel[i] = img->maxval; //Verifying if pixel levels don't exceed maxval
-        else img->pixel[i] = (uint8)factor * img->pixel[i];
+        if ((factor * img->pixel[i]) > img->maxval) {img->pixel[i] = img->maxval;} //Verifying if pixel levels don't exceed maxval
+        else {img->pixel[i] = factor * img->pixel[i];}
     }
 }
 
@@ -484,8 +474,19 @@ void ImageBrighten(Image img, double factor) { ///
 /// On failure, returns NULL and errno/errCause are set accordingly.
 Image ImageRotate(Image img) { ///
     assert (img != NULL);
-    // Insert your code here!
-    // TO DO
+    // Altered
+    // Creating a new image with swapped width and height
+    Image rImg = ImageCreate(img->height, img->width, img->maxval);
+    for (int y = 0; y < img->height; y++) {
+        for (int x =0; x < img->width; x++) {
+            // Swap x and y coordinates
+            int rx = y;
+            int ry = img->width - x - 1;
+            uint8 level = ImageGetPixel(img,x,y);
+            ImageSetPixel(rImg, rx, ry, level);
+        }
+    }
+    return rImg;
 }
 
 /// Mirror an image = flip left-right.
@@ -497,54 +498,20 @@ Image ImageRotate(Image img) { ///
 /// On failure, returns NULL and errno/errCause are set accordingly.
 Image ImageMirror(Image img) { ///
     assert (img != NULL);
-    // Insert your code here!
-    // TO DO
+    // Altered
+    // Creating a new image with same width and height
+    Image mImg = ImageCreate(img->width, img->height, img->maxval);
+    for (int y = 0; y < img->height; y++) {
+        for (int x =0; x < img->width; x++) {
+            // Flip x coordinates and keep y the same
+            int rx = img->height - x- 1;
+            int ry = y;
+            uint8 level = ImageGetPixel(img,x,y);
+            ImageSetPixel(mImg, rx, ry, level);
+        }
+    }
+    return mImg;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 /// Crop a rectangular subimage from img.
@@ -562,8 +529,7 @@ Image ImageMirror(Image img) { ///
 Image ImageCrop(Image img, int x, int y, int w, int h) { ///
     assert (img != NULL);
     assert (ImageValidRect(img, x, y, w, h));
-    // Insert your code here!
-    // TO DO
+    // Altered
     Image newImg = ImageCreate(w, h, img->maxval);
 
     // Set all pixels of newImg to correspondent ones of img
@@ -586,8 +552,7 @@ void ImagePaste(Image img1, int x, int y, Image img2) { ///
     assert (img1 != NULL);
     assert (img2 != NULL);
     assert (ImageValidRect(img1, x, y, img2->width, img2->height));
-    // Insert your code here!
-    // TO DO
+    // Altered
 
     int w = img2->width;
     int h = img2->height;
@@ -608,8 +573,15 @@ void ImageBlend(Image img1, int x, int y, Image img2, double alpha) { ///
     assert (img1 != NULL);
     assert (img2 != NULL);
     assert (ImageValidRect(img1, x, y, img2->width, img2->height));
-    // Insert your code here!
-    // TO DO
+    // Altered
+
+    int w = img2->width;
+    int h = img2->height;
+    // Set all pixels of newImg to correspondent ones of img
+    for(int i = 0; i < w * h; i++) {
+        uint8 index = G(img1, x + i % w, y + i / w); // RELATORIO
+        img1->pixel[index] = (1 - alpha) * img1->pixel[i] + alpha * img2->pixel[i];
+    }
 }
 
 /// Compare an image to a subimage of a larger image.
@@ -619,8 +591,18 @@ int ImageMatchSubImage(Image img1, int x, int y, Image img2) { ///
     assert (img1 != NULL);
     assert (img2 != NULL);
     assert (ImageValidPos(img1, x, y));
-    // Insert your code here!
-    // TO DO
+    // Altered
+
+    Image subImg = ImageCrop(img1, x, y, img1->width - x, img1->height - y);
+    if (img2->width == subImg->width && img2->height == subImg->height && img2->maxval == subImg->maxval){
+        for (int i = 0; i < img1->width * img1->height; i++){
+            if(img2->pixel[i] != subImg->pixel[i]){
+                return 0;
+            }
+        }
+        return 1;
+    }
+    return 0;
 }
 
 /// Locate a subimage inside another image.
@@ -630,8 +612,20 @@ int ImageMatchSubImage(Image img1, int x, int y, Image img2) { ///
 int ImageLocateSubImage(Image img1, int *px, int *py, Image img2) { ///
     assert (img1 != NULL);
     assert (img2 != NULL);
-    // Insert your code here!
-    // TO DO
+    // Altered
+
+    // Iterate through all possible positions in img1
+    for (int y = 0; y <= img1->height - img2->height; y++) {
+        for (int x = 0; x <= img1->width - img2->width; x++) {
+            if (ImageMatchSubImage(img1, x, y, img2)) {
+                *px = x;
+                *py = y;
+                return 1;
+            }
+        }
+    }
+
+    return 0;
 }
 
 
@@ -642,7 +636,37 @@ int ImageLocateSubImage(Image img1, int *px, int *py, Image img2) { ///
 /// [x-dx, x+dx]x[y-dy, y+dy].
 /// The image is changed in-place.
 void ImageBlur(Image img, int dx, int dy) { ///
-    // Insert your code here!
-    // TO DO
+    // Altered
+    assert(img != NULL);
+    assert(dx >= 0 && dy >= 0);
+    Image imgCopy = img;
+
+    for (int y = 0; y < imgCopy->height; y++) {
+        for (int x = 0; x < imgCopy->width; x++) {
+            // Calculate the mean value of the surrounding pixels
+            int sum = 0;
+            int count = 0;
+
+            for (int j = -dy; j <= dy; j++) {
+                for (int i = -dx; i <= dx; i++) {
+                    int nx = x + i;
+                    int ny = y + j;
+
+                    // Check if the coordinates are within the bounds of the image
+                    if (nx >= 0 && nx < imgCopy->width && ny >= 0 && ny < imgCopy->height) {
+                        int index = G(img, nx, ny);
+                        sum += imgCopy->pixel[index];
+                        count++;
+                    }
+                }
+            }
+
+            // Calculate the mean and update the pixel value in the temporary image
+            int mean = count > 0 ? sum / count : 0;
+            int index = G(img, x, y);
+            img->pixel[index] = mean;
+        }
+    }
+    ImageDestroy(&imgCopy);
 }
 
