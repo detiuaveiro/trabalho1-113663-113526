@@ -444,19 +444,9 @@ void ImageBrighten(Image img, double factor) { ///
     assert (factor >= 0.0);
     // Altered
 
-    /*
     for (int i = 0; i < img->width * img->height; i++) {
-        img->pixel[i] = (uint8)factor * img->pixel[i];
-
-        //Verifying if pixel levels don't exceed maxval
-        if (img->pixel[i] > img->maxval) {
-            img->pixel[i] = img->maxval;
-        }
-    } */
-
-    for (int i = 0; i < img->width * img->height; i++) {
-        if (((uint8)factor * img->pixel[i]) > img->maxval) img->pixel[i] = img->maxval; //Verifying if pixel levels don't exceed maxval
-        else img->pixel[i] = (uint8)factor * img->pixel[i];
+        if ((factor * img->pixel[i]) > img->maxval) {img->pixel[i] = img->maxval;} //Verifying if pixel levels don't exceed maxval
+        else {img->pixel[i] = factor * img->pixel[i];}
     }
 }
 
@@ -484,8 +474,22 @@ void ImageBrighten(Image img, double factor) { ///
 /// On failure, returns NULL and errno/errCause are set accordingly.
 Image ImageRotate(Image img) { ///
     assert (img != NULL);
-    // Insert your code here!
-    // TO DO
+    // Altered
+
+    // Creating a new image with swapped width and height
+    Image rImg = ImageCreate(img->height, img->width, img->maxval);
+
+    for (int y = 0; y < img->height; y++) {
+        for (int x =0; x < img->width; x++) {
+            // Swap x and y coordinates
+            int rx = y;
+            int ry = img->width - x - 1;
+
+            uint8 level = ImageGetPixel(img,x,y);
+            ImageSetPixel(rImg, rx, ry, level);
+        }
+    }
+    return rImg;
 }
 
 /// Mirror an image = flip left-right.
@@ -497,8 +501,22 @@ Image ImageRotate(Image img) { ///
 /// On failure, returns NULL and errno/errCause are set accordingly.
 Image ImageMirror(Image img) { ///
     assert (img != NULL);
-    // Insert your code here!
-    // TO DO
+    // Altered
+
+    // Creating a new image with same width and height
+    Image mImg = ImageCreate(img->width, img->height, img->maxval);
+
+    for (int y = 0; y < img->height; y++) {
+        for (int x =0; x < img->width; x++) {
+            // Flip x coordinates and keep y the same
+            int rx = img->height - x- 1;
+            int ry = y;
+
+            uint8 level = ImageGetPixel(img,x,y);
+            ImageSetPixel(mImg, rx, ry, level);
+        }
+    }
+    return mImg;
 }
 
 /// Crop a rectangular subimage from img.
