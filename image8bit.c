@@ -173,17 +173,19 @@ Image ImageCreate(int width, int height, uint8 maxval) { ///
     assert (0 < maxval && maxval <= PixMax);
     // Altered
 
-    Image img = NULL;
+    // Allocating a new image
+    Image img = (Image)malloc(sizeof(struct image));
 
     // Initializing image properties
     img->width = width;
     img->height = height;
     img->maxval = maxval;
 
-    // Allocatinf memory for the pixel data
+    // Allocating memory for the pixel data
     img->pixel = (uint8*)malloc(width * height * sizeof(uint8));
 
     if (img->pixel == NULL) {
+        free(img); // Freeing Image
         return NULL; // If allocation fails return null
     }
 
@@ -191,7 +193,6 @@ Image ImageCreate(int width, int height, uint8 maxval) { ///
     for(int i = 0; i < width * height; i++) {
         img->pixel[i] = 0;
     }
-
     return img;
 }
 
