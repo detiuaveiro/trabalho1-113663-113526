@@ -580,22 +580,16 @@ void ImageBlend(Image img1, int x, int y, Image img2, double alpha) { ///
     int w = img2->width;
     int h = img2->height;
     // Set all pixels of newImg to correspondent ones of img
-    for (int j = 0; j < h; j++) {
-        for (int i = 0; i < w; i++) {
-            // Calculate the index for the pixel in each image.
-            int img1PixelIndex = G(img1, x + i, y + j);
-            int img2PixelIndex = G(img2, i, j);
+    for(int i = 0; i < w * h; i++) {
+        int index = G(img1, x + i % w, y + i / w); // RELATORIO
+        double pixel1 = (double)img1->pixel[index];
+        double pixel2 = (double)img2->pixel[i];
 
-            // Pixel data from each image.
-            double pixel1 = (double) img1->pixel[img1PixelIndex];
-            double pixel2 = (double) img2->pixel[img2PixelIndex];
+        // Blend using double precision
+        double blendedValue = (1.0 - alpha) * pixel1 + alpha * pixel2;
 
-            // Blend the pixel values.
-            double blendedValue = (1.0 - alpha) * pixel1 + alpha * pixel2;
-
-            // Clamp the final value
-            img1->pixel[img1PixelIndex] = (uint8)fmin(fmax(blendedValue, 0.0), 255.0);
-        }
+        // Saturate and cast back to uint8
+        img1->pixel[index] = (uint8)fmin(fmax(blendedValue, 0), ImageMaxval(img1));
     }
 }
 
