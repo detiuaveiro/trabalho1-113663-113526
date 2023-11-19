@@ -533,7 +533,7 @@ Image ImageCrop(Image img, int x, int y, int w, int h) { ///
     Image newImg = ImageCreate(w, h, img->maxval);
 
     // Set all pixels of newImg to correspondent ones of img
-    for(int i = 0; i < w * h; i++) {
+    for(uint8 i = 0; i < w * h; i++) {
         uint8 index = G(img, x + i % w, y + i / w); // RELATORIO
         newImg->pixel[i] = img->pixel[index];
     }
