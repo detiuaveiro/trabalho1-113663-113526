@@ -580,13 +580,11 @@ void ImageBlend(Image img1, int x, int y, Image img2, double alpha) { ///
     // Set all pixels of newImg to correspondent ones of img
     for(int i = 0; i < w * h; i++) {
         int index = G(img1, x + i % w, y + i / w); // RELATORIO
-        
-        double pixel1 = (double)img1->pixel[index];
-        double pixel2 = (double)img2->pixel[i];
 
-        double blendedValue = (1 - alpha) * pixel1 + alpha * pixel2;
+        uint8 a1 = (uint8)(1 - alpha);
+        uint8 a2 = (uint8)alpha;
 
-        img1->pixel[index] = (uint8)blendedValue;
+        img1->pixel[index] = a1 * img1->pixel[index] + a2 * img2->pixel[i];
     }
 }
 
