@@ -26,8 +26,6 @@
 #include <stdlib.h>
 #include "instrumentation.h"
 
-#include <math.h>
-
 // The data structure
 //
 // An image is stored in a structure containing 3 fields:
@@ -582,14 +580,7 @@ void ImageBlend(Image img1, int x, int y, Image img2, double alpha) { ///
     // Set all pixels of newImg to correspondent ones of img
     for(int i = 0; i < w * h; i++) {
         int index = G(img1, x + i % w, y + i / w); // RELATORIO
-        double pixel1 = (double)img1->pixel[index];
-        double pixel2 = (double)img2->pixel[i];
-
-        // Blend using double precision
-        double blendedValue = (1.0 - alpha) * pixel1 + alpha * pixel2;
-
-        // Saturate and cast back to uint8
-        img1->pixel[index] = (uint8)fmin(fmax(blendedValue, 255), 0);
+        img1->pixel[index] = (1 - alpha) * img1->pixel[index] + alpha * img2->pixel[i];
     }
 }
 
