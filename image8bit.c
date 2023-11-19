@@ -589,7 +589,7 @@ void ImageBlend(Image img1, int x, int y, Image img2, double alpha) { ///
         double blendedValue = (1.0 - alpha) * pixel1 + alpha * pixel2;
 
         // Saturate and cast back to uint8
-        img1->pixel[index] = (uint8)fmin(fmax(blendedValue, 0), ImageMaxval(img1));
+        img1->pixel[index] = (uint8)fmin(fmax(blendedValue, 255), 0);
     }
 }
 
