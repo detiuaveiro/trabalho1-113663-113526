@@ -477,6 +477,13 @@ Image ImageRotate(Image img) { ///
     // Altered
     // Creating a new image with swapped width and height
     Image rImg = ImageCreate(img->height, img->width, img->maxval);
+
+    if (rImg == NULL) {
+        errno = ENOMEM;
+        errCause = "Failed to allocate memory for rotated image";
+        return NULL;
+    }
+
     for (int y = 0; y < img->height; y++) {
         for (int x =0; x < img->width; x++) {
             // Swap x and y coordinates
@@ -501,6 +508,13 @@ Image ImageMirror(Image img) { ///
     // Altered
     // Creating a new image with same width and height
     Image mImg = ImageCreate(img->width, img->height, img->maxval);
+
+    if (mImg == NULL) {
+        errno = ENOMEM;
+        errCause = "Failed to allocate memory for mirrored image";
+        return NULL;
+    }
+
     for (int y = 0; y < img->height; y++) {
         for (int x =0; x < img->width; x++) {
             // Flip x coordinates and keep y the same
@@ -530,15 +544,21 @@ Image ImageCrop(Image img, int x, int y, int w, int h) { ///
     assert (img != NULL);
     assert (ImageValidRect(img, x, y, w, h));
     // Altered
-    Image newImg = ImageCreate(w, h, img->maxval);
+    Image cImg = ImageCreate(w, h, img->maxval);
 
-    // Set all pixels of newImg to correspondent ones of img
-    for(int i = 0; i < w * h; i++) {
-        int index = G(img, x + i % w, y + i / w); // RELATORIO
-        newImg->pixel[i] = img->pixel[index];
+    if (cImg == NULL) {
+        errno = ENOMEM;
+        errCause = "Failed to allocate memory for cropped image";
+        return NULL;
     }
 
-    return newImg;
+    // Set all pixels of cImg to correspondent ones of img
+    for(int i = 0; i < w * h; i++) {
+        int index = G(img, x + i % w, y + i / w);
+        cImg->pixel[i] = img->pixel[index];
+    }
+
+    return cImg;
 }
 
 
@@ -558,7 +578,7 @@ void ImagePaste(Image img1, int x, int y, Image img2) { ///
     int h = img2->height;
     // Set all pixels of newImg to correspondent ones of img
     for(int i = 0; i < w * h; i++) {
-        int index = G(img1, x + i % w, y + i / w); // RELATORIO
+        int index = G(img1, x + i % w, y + i / w);
         img1->pixel[index] = img2->pixel[i];
     }
 }
