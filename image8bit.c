@@ -446,7 +446,7 @@ void ImageBrighten(Image img, double factor) { ///
 
     for (int i = 0; i < img->width * img->height; i++) {
         if ((factor * img->pixel[i]) > img->maxval) {img->pixel[i] = img->maxval;} //Verifying if pixel levels don't exceed maxval
-        else {img->pixel[i] = factor * img->pixel[i];}
+        else {img->pixel[i] = (uint8)(factor * img->pixel[i] + 0.5);} // Adding 0.5 ensures it will round correctly when converting to uint8
     }
 }
 
@@ -600,11 +600,11 @@ void ImageBlend(Image img1, int x, int y, Image img2, double alpha) { ///
     // Set all pixels of newImg to correspondent ones of img
     for(int i = 0; i < w * h; i++) {
         int index = G(img1, x + i % w, y + i / w); // RELATORIO
-        
+
         double pixel1 = (double)img1->pixel[index];
         double pixel2 = (double)img2->pixel[i];
 
-        double blendedValue = (1 - alpha) * pixel1 + alpha * pixel2;
+        double blendedValue = ((1 - alpha) * pixel1 + alpha * pixel2)+ 0.5; // Adding 0.5 ensures it will round correctly when converting to uint8
 
         img1->pixel[index] = (uint8)blendedValue;
     }
@@ -680,7 +680,7 @@ void ImageBlur(Image img, int dx, int dy) { ///
 
                     // Check if the coordinates are within the bounds of the image
                     if (nx >= 0 && nx < imgCopy->width && ny >= 0 && ny < imgCopy->height) {
-                        int index = G(img, nx, ny);
+                        int index = G(imgCopy, nx, ny);
                         sum += imgCopy->pixel[index];
                         count++;
                     }
