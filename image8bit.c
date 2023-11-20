@@ -676,6 +676,6 @@ void ImageBlur(Image img, int dx, int dy) { ///
             img->pixel[index] = mean;
         }
     }
-    free(imgCopy);
+    ImageDestroy(&imgCopy);
 }
 
