@@ -531,6 +531,9 @@ Image ImageCrop(Image img, int x, int y, int w, int h) { ///
     assert (ImageValidRect(img, x, y, w, h));
     // Altered
     Image newImg = ImageCreate(w, h, img->maxval);
+    if (newImg == NULL){
+        return NULL;
+    }
 
     // Set all pixels of newImg to correspondent ones of img
     for(int i = 0; i < w * h; i++) {
@@ -580,7 +583,7 @@ void ImageBlend(Image img1, int x, int y, Image img2, double alpha) { ///
     // Set all pixels of newImg to correspondent ones of img
     for(int i = 0; i < w * h; i++) {
         int index = G(img1, x + i % w, y + i / w); // RELATORIO
-        
+
         double pixel1 = (double)img1->pixel[index];
         double pixel2 = (double)img2->pixel[i];
 
