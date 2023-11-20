@@ -662,9 +662,9 @@ void ImageBlur(Image img, int dx, int dy) { ///
                     int ny = y + j;
 
                     // Check if the coordinates are within the bounds of the image
-                    if (nx >= 0 && nx < imgCopy->width && ny >= 0 && ny < imgCopy->height) {
+                    if (nx >= 0 && nx < img->width && ny >= 0 && ny < img->height) {
                         int index = G(img, nx, ny);
-                        sum += imgCopy->pixel[index];
+                        sum += img->pixel[index];
                         count++;
                     }
                 }
