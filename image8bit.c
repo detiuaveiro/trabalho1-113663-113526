@@ -656,8 +656,8 @@ void ImageBlur(Image img, int dx, int dy) { ///
             int sum = 0;
             int count = 0;
 
-            for (int j = -dy; j <= dy; j++) {
-                for (int i = -dx; i <= dx; i++) {
+            for (int j = -2*dy; j <= 2*dy; j++) {
+                for (int i = -2*dx; i <= 2*dx; i++) {
                     int nx = x + i;
                     int ny = y + j;
 
