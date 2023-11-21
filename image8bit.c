@@ -665,7 +665,10 @@ void ImageBlur(Image img, int dx, int dy) { ///
     // Altered
     assert(img != NULL);
     assert(dx >= 0 && dy >= 0);
-    Image imgCopy = img;
+    Image imgCopy = ImageCreate(img->width, img->height, img->maxval);
+    for (int i = 0; i < img->width * img->height; i++){
+        imgCopy->pixel[i] = img->pixel[i];
+    }
 
     for (int y = 0; y < imgCopy->height; y++) {
         for (int x = 0; x < imgCopy->width; x++) {
@@ -690,7 +693,7 @@ void ImageBlur(Image img, int dx, int dy) { ///
             // Calculate the mean and update the pixel value in the temporary image
             int mean = count > 0 ? sum / count : 0;
             int index = G(img, x, y);
-            img->pixel[index] = mean;
+            img->pixel[index] = mean + 1;
         }
     }
     ImageDestroy(&imgCopy);
