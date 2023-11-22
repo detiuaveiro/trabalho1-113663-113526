@@ -670,6 +670,47 @@ void ImageBlur(Image img, int dx, int dy) { ///
         imgCopy->pixel[i] = img->pixel[i];
     }
 
+    int count, index, indexCopy, nx, ny, mean;
+    double sum;
+    for (int y = 0; y < imgCopy->height; y++) {
+        for (int x = 0; x < imgCopy->width; x++) {
+            // Calculate the mean value of the surrounding pixels
+            mean = 0;
+            sum = 0.0;
+            count = 0;
+
+            for (int j = -dy; j <= dy; j++) {
+                for (int i = -dx; i <= dx; i++) {
+                    nx = x + i;
+                    ny = y + j;
+
+                    // Check if the coordinates are within the bounds of the image
+                    if (nx >= 0 && nx < imgCopy->width && ny >= 0 && ny < imgCopy->height) {
+                        indexCopy = G(imgCopy, nx, ny);
+                        sum += imgCopy->pixel[indexCopy];
+                        count++;
+                    }
+                }
+            }
+
+            // Calculate the mean and update the pixel value in the temporary image
+            mean = count > 0 ? (int)(sum / count + 0.5) : 0;
+            index = G(img, x, y);
+            img->pixel[index] = (uint8)mean;
+        }
+    }
+    ImageDestroy(&imgCopy);
+}
+
+void ImageBlur1(Image img, int dx, int dy) { ///
+    // Altered
+    assert(img != NULL);
+    assert(dx >= 0 && dy >= 0);
+    Image imgCopy = ImageCreate(img->width, img->height, img->maxval);
+    for (int i = 0; i < img->width * img->height; i++){
+        imgCopy->pixel[i] = img->pixel[i];
+    }
+
     for (int y = 0; y < imgCopy->height; y++) {
         for (int x = 0; x < imgCopy->width; x++) {
             // Calculate the mean value of the surrounding pixels
