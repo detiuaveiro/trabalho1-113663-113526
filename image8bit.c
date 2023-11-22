@@ -445,8 +445,10 @@ void ImageBrighten(Image img, double factor) { ///
     // Altered
 
     for (int i = 0; i < img->width * img->height; i++) {
-        if ((factor * img->pixel[i]) > img->maxval) {img->pixel[i] = img->maxval;} //Verifying if pixel levels don't exceed maxval
-        else {img->pixel[i] = (uint8)(factor * img->pixel[i] + 0.5);} // Adding 0.5 ensures it will round correctly when converting to uint8
+        if ((factor * img->pixel[i]) > img->maxval) {
+            img->pixel[i] = img->maxval; //Verifying if pixel levels don't exceed maxval
+        } else
+            img->pixel[i] = (uint8)(factor * img->pixel[i] + 0.5); // Adding 0.5 ensures it will round correctly when converting to uint8
     }
 }
 
@@ -485,7 +487,7 @@ Image ImageRotate(Image img) { ///
     }
 
     for (int y = 0; y < img->height; y++) {
-        for (int x =0; x < img->width; x++) {
+        for (int x = 0; x < img->width; x++) {
             // Swap x and y coordinates
             int rx = y;
             int ry = img->width - x - 1;
@@ -604,7 +606,7 @@ void ImageBlend(Image img1, int x, int y, Image img2, double alpha) { ///
         double pixel1 = (double)img1->pixel[index];
         double pixel2 = (double)img2->pixel[i];
 
-        double blendedValue = ((1 - alpha) * pixel1 + alpha * pixel2)+ 0.5; // Adding 0.5 ensures it will round correctly when converting to uint8
+        double blendedValue = ((1 - alpha) * pixel1 + alpha * pixel2) + 0.5; // Adding 0.5 ensures it will round correctly when converting to uint8
 
         img1->pixel[index] = (uint8)blendedValue;
     }
