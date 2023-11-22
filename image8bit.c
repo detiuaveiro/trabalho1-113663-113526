@@ -677,7 +677,6 @@ void ImageBlur(Image img, int dx, int dy) { ///
     for (int y = 0; y < imgCopy->height; y++) {
         for (int x = 0; x < imgCopy->width; x++) {
             // Calculate the mean value of the surrounding pixels
-            mean = 0;
             sum = 0.0;
             count = 0;
 
