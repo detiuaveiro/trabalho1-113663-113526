@@ -623,7 +623,7 @@ int ImageMatchSubImage(Image img1, int x, int y, Image img2) { ///
 
     Image subImg = ImageCrop(img1, x, y, img1->width - x, img1->height - y);
     if (img2->width == subImg->width && img2->height == subImg->height && img2->maxval == subImg->maxval){
-        for (int i = 0; i < img1->width * img1->height; i++){
+        for (int i = 0; i < img2->width * img2->height; i++){
             if(img2->pixel[i] != subImg->pixel[i]){
                 return 0;
             }
@@ -646,8 +646,8 @@ int ImageLocateSubImage(Image img1, int *px, int *py, Image img2) { ///
     for (int y = 0; y <= img1->height - img2->height; y++) {
         for (int x = 0; x <= img1->width - img2->width; x++) {
             if (ImageMatchSubImage(img1, x, y, img2)) {
-                *px = x;
-                *py = y;
+                px = &x;
+                py = &y;
                 return 1;
             }
         }
