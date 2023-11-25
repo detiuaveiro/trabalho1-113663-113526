@@ -620,22 +620,17 @@ int ImageMatchSubImage(Image img1, int x, int y, Image img2) { ///
     assert (img2 != NULL);
     assert (ImageValidPos(img1, x, y));
     // Altered
-    int b = 1;
+    assert(img2->width <= img1->width - x);
+    assert(img2->height <= img1->height - y);
 
-    for (int h = 1; h <= img1->height - y; h++) {
-        for (int w = 1; w <= img1->width - x; w++) {
-            Image subImg = ImageCrop(img1, x, y, w, h);
-            if (img2->width == w && img2->height == h && img2->maxval == subImg->maxval) {
-                for (int i = 0; i < img2->width * img2->height; i++) {
-                    if (img2->pixel[i] != subImg->pixel[i]) {
-                        b = 0;
-                    }
-                }
-                if (b){
-                    return 1;
-                }
+    Image subImg = ImageCrop(img1, x, y, img2->width, img2->height);
+    if (img2->maxval == subImg->maxval){ // REFERIR
+        for (int i = 0; i < img2->width * img2->height; i++){
+            if(img2->pixel[i] != subImg->pixel[i]){
+                return 0;
             }
         }
+        return 1;
     }
     return 0;
 }
@@ -709,3 +704,42 @@ void ImageBlur(Image img, int dx, int dy) { ///
     }
     ImageDestroy(&imgCopy);
 }
+
+void ImageBlur1(Image img, int dx, int dy) { ///
+    // Altered
+    assert(img != NULL);
+    assert(dx >= 0 && dy >= 0);
+    Image imgCopy = ImageCreate(img->width, img->height, img->maxval);
+    for (int i = 0; i < img->width * img->height; i++){
+        imgCopy->pixel[i] = img->pixel[i];
+    }
+
+    for (int y = 0; y < imgCopy->height; y++) {
+        for (int x = 0; x < imgCopy->width; x++) {
+            // Calculate the mean value of the surrounding pixels
+            double sum = 0.0;
+            int count = 0;
+
+            for (int j = -dy; j <= dy; j++) {
+                for (int i = -dx; i <= dx; i++) {
+                    int nx = x + i;
+                    int ny = y + j;
+
+                    // Check if the coordinates are within the bounds of the image
+                    if (nx >= 0 && nx < imgCopy->width && ny >= 0 && ny < imgCopy->height) {
+                        int index = G(imgCopy, nx, ny);
+                        sum += imgCopy->pixel[index];
+                        count++;
+                    }
+                }
+            }
+
+            // Calculate the mean and update the pixel value in the temporary image
+            int mean = count > 0 ? (int)(sum / count + 0.5) : 0;
+            int index = G(img, x, y);
+            img->pixel[index] = (uint8)mean;
+        }
+    }
+    ImageDestroy(&imgCopy);
+}
+
