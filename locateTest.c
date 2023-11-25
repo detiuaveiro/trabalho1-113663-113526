@@ -7,7 +7,7 @@ int main(void){
     int y = 38;
     int *px;
     int *py;
-    Image img2 = ImageCrop(img, x, y, 100, 100);
+    Image img2 = ImageCrop(img, x, y, 5, 5);
     int maxval = ImageMaxval(img2);
     ImageSave(img2, "teste.pgm");
     int b = ImageMatchSubImage(img, x, y, img2);
