@@ -624,15 +624,12 @@ int ImageMatchSubImage(Image img1, int x, int y, Image img2) { ///
     assert(img2->height <= img1->height - y);
 
     Image subImg = ImageCrop(img1, x, y, img2->width, img2->height);
-    if (img2->maxval == subImg->maxval){ // REFERIR
-        for (int i = 0; i < img2->width * img2->height; i++){
-            if(img2->pixel[i] != subImg->pixel[i]){
-                return 0;
-            }
+    for (int i = 0; i < img2->width * img2->height; i++){
+        if(img2->pixel[i] != subImg->pixel[i]){
+            return 0;
         }
-        return 1;
     }
-    return 0;
+    return 1;
 }
 
 /// Locate a subimage inside another image.
