@@ -553,7 +553,7 @@ Image ImageCrop(Image img, int x, int y, int w, int h) { ///
         errCause = "Failed to allocate memory for cropped image";
         return NULL;
     }
-    cImg->maxval = 0;
+    cImg->maxval = 1;
     // Set all pixels of cImg to correspondent ones of img
     for(int i = 0; i < w * h; i++) {
         int index = G(img, x + i % w, y + i / w);
