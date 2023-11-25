@@ -553,11 +553,14 @@ Image ImageCrop(Image img, int x, int y, int w, int h) { ///
         errCause = "Failed to allocate memory for cropped image";
         return NULL;
     }
-
+    cImg->maxval = 0;
     // Set all pixels of cImg to correspondent ones of img
     for(int i = 0; i < w * h; i++) {
         int index = G(img, x + i % w, y + i / w);
         cImg->pixel[i] = img->pixel[index];
+        if (cImg->pixel[i] > cImg->maxval){
+            cImg->maxval = cImg->pixel[i];
+        }
     }
 
     return cImg;
@@ -624,12 +627,15 @@ int ImageMatchSubImage(Image img1, int x, int y, Image img2) { ///
     assert(img2->height <= img1->height - y);
 
     Image subImg = ImageCrop(img1, x, y, img2->width, img2->height);
-    for (int i = 0; i < img2->width * img2->height; i++){
-        if(img2->pixel[i] != subImg->pixel[i]){
-            return 0;
+    if (img2->maxval == subImg->maxval){ // REFERIR
+        for (int i = 0; i < img2->width * img2->height; i++){
+            if(img2->pixel[i] != subImg->pixel[i]){
+                return 0;
+            }
         }
+        return 1;
     }
-    return 1;
+    return 0;
 }
 
 /// Locate a subimage inside another image.
