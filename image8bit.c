@@ -615,6 +615,12 @@ void ImageBlend(Image img1, int x, int y, Image img2, double alpha) { ///
     }
 }
 
+int comp;
+
+int comps(void){
+    return comp;
+}
+
 /// Compare an image to a subimage of a larger image.
 /// Returns 1 (true) if img2 matches subimage of img1 at pos (x, y).
 /// Returns 0, otherwise.
@@ -639,6 +645,7 @@ int ImageMatchSubImage(Image img1, int x, int y, Image img2) { ///
 
     //if (*min == *min2 && *max == *max2){ // REFERIR
     for (int i = 0; i < img2->width * img2->height; i++){
+        comp++;
         if(img2->pixel[i] != subImg->pixel[i]){
             return 0;
         }
@@ -657,9 +664,10 @@ int ImageLocateSubImage(Image img1, int *px, int *py, Image img2) { ///
     assert (img2 != NULL);
     // Altered
 
+    comp = 0;
     // Iterate through all possible positions in img1
     for (int y = 0; y <= img1->height - img2->height; y++) {
-        for (int x = 0; x <= img1->width - img2->width; x++) {
+            for (int x = 0; x <= img1->width - img2->width; x++) {
             if (ImageMatchSubImage(img1, x, y, img2)) {
                 px = &x;
                 py = &y;
