@@ -663,7 +663,7 @@ int ImageLocateSubImage(Image img1, int *px, int *py, Image img2) { ///
     COMP = 0;
     // Iterate through all possible positions in img1
     for (int y = 0; y <= img1->height - img2->height; y++) {
-            for (int x = 0; x <= img1->width - img2->width; x++) {
+        for (int x = 0; x <= img1->width - img2->width; x++) {
             if (ImageMatchSubImage(img1, x, y, img2)) {
                 px = &x;
                 py = &y;
@@ -721,42 +721,3 @@ void ImageBlur(Image img, int dx, int dy) { ///
     }
     ImageDestroy(&imgCopy);
 }
-
-void ImageBlur1(Image img, int dx, int dy) { ///
-    // Altered
-    assert(img != NULL);
-    assert(dx >= 0 && dy >= 0);
-    Image imgCopy = ImageCreate(img->width, img->height, img->maxval);
-    for (int i = 0; i < img->width * img->height; i++){
-        imgCopy->pixel[i] = img->pixel[i];
-    }
-
-    for (int y = 0; y < imgCopy->height; y++) {
-        for (int x = 0; x < imgCopy->width; x++) {
-            // Calculate the mean value of the surrounding pixels
-            double sum = 0.0;
-            int count = 0;
-
-            for (int j = -dy; j <= dy; j++) {
-                for (int i = -dx; i <= dx; i++) {
-                    int nx = x + i;
-                    int ny = y + j;
-
-                    // Check if the coordinates are within the bounds of the image
-                    if (nx >= 0 && nx < imgCopy->width && ny >= 0 && ny < imgCopy->height) {
-                        int index = G(imgCopy, nx, ny);
-                        sum += imgCopy->pixel[index];
-                        count++;
-                    }
-                }
-            }
-
-            // Calculate the mean and update the pixel value in the temporary image
-            int mean = count > 0 ? (int)(sum / count + 0.5) : 0;
-            int index = G(img, x, y);
-            img->pixel[index] = (uint8)mean;
-        }
-    }
-    ImageDestroy(&imgCopy);
-}
-
