@@ -148,6 +148,7 @@ void ImageInit(void) { ///
     InstrName[0] = "pixmem";  // InstrCount[0] will count pixel array acesses
     // Name other counters here...
     // TO DO
+    InstrName[1] = "comparison";  // InstrCount[1] will count number of pixel comparisons between 2 images
 }
 
 // Macros to simplify accessing instrumentation counters:
@@ -155,6 +156,7 @@ void ImageInit(void) { ///
 // Add more macros here...
 // TO DO
 // TIP: Search for PIXMEM or InstrCount to see where it is incremented!
+#define COMP InstrCount[1]
 
 
 /// Image management functions
@@ -615,12 +617,6 @@ void ImageBlend(Image img1, int x, int y, Image img2, double alpha) { ///
     }
 }
 
-int comp;
-
-int comps(void){
-    return comp;
-}
-
 /// Compare an image to a subimage of a larger image.
 /// Returns 1 (true) if img2 matches subimage of img1 at pos (x, y).
 /// Returns 0, otherwise.
@@ -645,7 +641,7 @@ int ImageMatchSubImage(Image img1, int x, int y, Image img2) { ///
 
     //if (*min == *min2 && *max == *max2){ // REFERIR
     for (int i = 0; i < img2->width * img2->height; i++){
-        comp++;
+        COMP++;
         if(img2->pixel[i] != subImg->pixel[i]){
             return 0;
         }
@@ -664,7 +660,7 @@ int ImageLocateSubImage(Image img1, int *px, int *py, Image img2) { ///
     assert (img2 != NULL);
     // Altered
 
-    comp = 0;
+    COMP = 0;
     // Iterate through all possible positions in img1
     for (int y = 0; y <= img1->height - img2->height; y++) {
             for (int x = 0; x <= img1->width - img2->width; x++) {
